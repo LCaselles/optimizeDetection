@@ -38,7 +38,7 @@ With ```path/to/images/``` being the the path to the input images
 
 Then you can run the inference on the provided dataset with the following script:
 ```
-python test_inferences.py --path_img path/to/images/ --path_gt path/to/ground_truth/ --path_models path/to/models --dump_path_quantized predictions_quantized --dump_path_non_quantized predictions --path_quantized_model quantized_model_full.pth --path_non_quantized_model non_quantized_model_full.pth
+python test_inferences.py --path_img path/to/images/ --path_gt path/to/ground_truth/ --dump_path_quantized predictions_quantized --dump_path_non_quantized predictions --path_quantized_model quantized_model_full.pth --path_non_quantized_model non_quantized_model_full.pth
 ```
 With ```path/to/images/``` being the the path to the input images of the dataset and ```path/to/ground_truth/``` the path the GT labels of the dataset.
 
