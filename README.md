@@ -1,4 +1,4 @@
-### Project Name: Time inference of car detection model
+### Time inference of car detection model
 
 ### Description:
 

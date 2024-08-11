@@ -1,7 +1,5 @@
 import cv2
 import numpy as np
-import torch
-import torchvision
 import torchvision.transforms as transforms
 from PIL import Image
 from coco_names import COCO_INSTANCE_CATEGORY_NAMES as coco_names
