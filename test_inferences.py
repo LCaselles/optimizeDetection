@@ -48,7 +48,7 @@ def inference_inputs(model, path_img, path_gt, dump_path, N_max=None):
     # Read the images and run inference for detections
     for file in os.listdir(path_img):
         input_image = Image.open(os.path.join(path_img, file))
-        boxes, classes, labels = detect_utils.predict(input_image, model, "cpu", 0.7)
+        boxes, classes, labels = utils.detect_utils.predict(input_image, model, "cpu", 0.7)
 
         # Filter results to keep only the cars
         len_boxes = boxes.shape[0]
@@ -65,8 +65,8 @@ def inference_inputs(model, path_img, path_gt, dump_path, N_max=None):
 
         # Dump prediction images
         image = cv2.cvtColor(np.asarray(input_image), cv2.COLOR_BGR2RGB)
-        image = detect_utils.draw_boxes(boxes, classes, labels, image)
-        image = detect_utils.draw_boxes(np.array(gt_boxes), classes_gt, labels_gt, image)
+        image = utils.detect_utils.draw_boxes(boxes, classes, labels, image)
+        image = utils.detect_utils.draw_boxes(np.array(gt_boxes), classes_gt, labels_gt, image)
         save_name = file.split(".png")[0]
         cv2.imwrite(os.path.join(dump_path, f"pred_{save_name}.jpg"), image)
 

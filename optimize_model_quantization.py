@@ -42,7 +42,7 @@ def load_calibration_data(path_img, num_samples=50):
     inputs = [transform(Image.open(os.path.join(path_img, file))).unsqueeze(0) for file in sampled_files]
     return torch.cat(inputs)
 
-def main(path_img="dataset/dataset/images/", path_models="models"):
+def main(path_img, path_models="models"):
     """
     Main function to load, process, and save the quantized model.
 
