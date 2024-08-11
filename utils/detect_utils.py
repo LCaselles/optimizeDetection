@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 import torchvision.transforms as transforms
 from PIL import Image
-from coco_names import COCO_INSTANCE_CATEGORY_NAMES as coco_names
+from .coco_names import COCO_INSTANCE_CATEGORY_NAMES as coco_names
 
 # Random colors for each class for visualization
 COLORS = np.random.uniform(0, 255, size=(len(coco_names), 3))

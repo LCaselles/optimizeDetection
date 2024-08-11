@@ -1,7 +1,7 @@
 import os
 import time
 import fire
-
+from tqdm import tqdm
 import torch
 import torchvision
 import numpy as np
@@ -12,7 +12,7 @@ import utils.detect_utils
 from metrics import compute_iou_matrix, get_scalar_metrics_with_precision_recall, parse_coordinates
 
 
-def inference_inputs(model, path_img, path_gt, dump_path, N_max=None):
+def inference_inputs(model, path_img, path_gt, dump_path):
     """
     Perform inference on input images and evaluate metrics against ground truth.
 
@@ -46,7 +46,7 @@ def inference_inputs(model, path_img, path_gt, dump_path, N_max=None):
     N = 0
 
     # Read the images and run inference for detections
-    for file in os.listdir(path_img):
+    for file in tqdm(os.listdir(path_img), desc="Processing inputs"):
         input_image = Image.open(os.path.join(path_img, file))
         boxes, classes, labels = utils.detect_utils.predict(input_image, model, "cpu", 0.7)
 
@@ -75,18 +75,13 @@ def inference_inputs(model, path_img, path_gt, dump_path, N_max=None):
         metric_img = get_scalar_metrics_with_precision_recall(iou_matrix, 0.65)
         for key in metric_img:
             metrics[key].append(metric_img[key])
-
-        N += 1
-        if N_max is not None and N >= N_max:
-            break
-
     return metrics
 
 
 def main(path_img, path_gt, dump_path_quantized="predictions_quantized", 
          dump_path_non_quantized="predictions", 
-         path_quantized_model='quantized_model_full.pth', 
-         path_non_quantized_model="non_quantized_model_full.pth"):
+         path_quantized_model='models/quantized_model_full.pth', 
+         path_non_quantized_model="models/non_quantized_model_full.pth"):
     """
     Main function to run inference with and without quantization, and print metrics.
 
@@ -112,30 +107,37 @@ def main(path_img, path_gt, dump_path_quantized="predictions_quantized",
     model_non_quantized = torchvision.models.detection.fasterrcnn_mobilenet_v3_large_fpn(pretrained=True)
     model_non_quantized.eval()
 
-    # Inference with quantized model
-    print("Start inference with quantization")
-    start = time.time()
-    metrics = inference_inputs(model_quantized, path_img, path_gt, dump_path_quantized, N_max=15)
-    print("Time to compute:", time.time() - start)
-    print("Quantized metrics:")
-    for metric in metrics.keys():
-        print(metric, np.mean(metrics[metric]))
-
     # Inference with non-quantized model
     print("Start inference without quantization")
     start = time.time()
-    metrics = inference_inputs(model_non_quantized, path_img, path_gt, dump_path_non_quantized, N_max=15)
-    print("Time to compute:", time.time() - start)
+    metrics = inference_inputs(model_non_quantized, path_img, path_gt, dump_path_non_quantized)
+    c_time = time.time() - start
+    print("Time to compute:", c_time)
+    metrics["time"] = c_time
     print("Non-quantized metrics:")
     for metric in metrics.keys():
         print(metric, np.mean(metrics[metric]))
+    np.save("non_quantized_metrics.npy", metrics)
+    
 
-"""
+    # Inference with quantized model
+    print("Start inference with quantization")
+    start = time.time()
+    metrics = inference_inputs(model_quantized, path_img, path_gt, dump_path_quantized)
+    c_time = time.time() - start
+    metrics["time"] = c_time
+    print("Time to compute:", c_time)
+    print("Quantized metrics:")
+    for metric in metrics.keys():
+        print(metric, np.mean(metrics[metric]))
+    np.save("quantized_metrics.npy", metrics) 
+
 if __name__ == "__main__":
     # Define paths (these can be changed to command-line arguments or configuration files)
-    path_img = "dataset/dataset/images/"
-    path_gt = "dataset/dataset/labels/"
+    path_img = "../dataset/dataset/images/"
+    path_gt = "../dataset/dataset/labels/"
     main(path_img, path_gt)
 """
 if __name__ == "__main__":
     fire.Fire(main)
+"""
